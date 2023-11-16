@@ -48,9 +48,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-        print(f'ERROR: {error}')
-        return 1
-
-
-if __name__ == '__main__':
-    sys.exit(main())
