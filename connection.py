@@ -6,7 +6,7 @@ import socket
 ###########################################################
 ####################### YOUR CODE #########################
 ###########################################################
-def handle_con(sock,conn,addr):
+def handle_con(conn):
     data = conn.recv(1024)
     size = struct.unpack_from("<I",data)
     print(size[0])
@@ -21,7 +21,7 @@ class Connection:
         return self.con.repr()
     
     def close(self):
-        self.connection.close()
+        self.con.close()
     
     def send_message(self, data):
         data = bytearray(data, encoding = 'utf-8')
@@ -40,15 +40,8 @@ class Connection:
  
 
     def receive_message(self):
-        try:
-            while True:
-                connect, addr = self.con.accept()
-                if len(addr) > 0:
-                    break
-            return handle_con(self.con ,connect ,addr)
-        
-        except Exception:
-            raise Exception("connection closed")
+        # assume we're connected
+        return handle_con(self.con)
     
 class connectionContextManager:
     def __init__(self, host, port):
@@ -59,6 +52,6 @@ class connectionContextManager:
         self.connection = Connection.connect(self.host,self.port)
         return self.connection
     
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         self.connection.close()
         
