@@ -1,8 +1,10 @@
+from threading import Thread
 import argparse
 import sys
 import struct
 import socket
-
+import listener
+import connection
 def get_args():
     parser = argparse.ArgumentParser(description='Send data to server.')
     parser.add_argument('server_ip', type=str,
@@ -13,19 +15,12 @@ def get_args():
 
 def run_server(ip, port):
     print("Going in")
-    sock = socket.socket(socket.AF_INET, socket.SOCK_RAW)
-    sock.bind(ip, port)
-    conn, addr = sock.accept()
-    print("connected")
-    while True:
-        
-        data = conn.recv(1024)
-        size ,data = struct.unpack("<Is",data)
-        print(data)
-    sock.close()
-
-
-
+    with listener.ListenerContextManager(port,ip) as listen:
+        listen.start()
+        with listen.accept() as con:
+            msg = con.receive_message()
+            print(msg)
+    
 def main():
     args = get_args()
     print(args)
